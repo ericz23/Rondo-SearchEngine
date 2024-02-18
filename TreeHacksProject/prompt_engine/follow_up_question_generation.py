@@ -125,35 +125,3 @@ def prompt_question_with_choices(question, choices):
         print("\n")
     user_input = input("Your answer: ").strip().upper()  # Prompt user for input
     return user_input
-
-
-# # Take input from the user
-# user_input = input("Enter your query: ")
-# previous_questions = []
-
-# while True:
-
-#     # Generate follow-up question based on the initial input query
-#     follow_up_question = generate_follow_up_question(user_input, previous_questions)
-
-#     choices, follow_up_question = get_multiple_choice(follow_up_question)
-
-#     # Prompt the user to answer the follow-up question
-#     user_answer = prompt_question_with_choices(follow_up_question, choices)
-
-#     if user_answer.lower() == 'other':
-#         user_answer = prompt_user("Please Specify:")
-
-#     # Generate a more specific query based on the user's answer
-#     user_input = refine_query(user_input, user_answer, follow_up_question)
-
-#     previous_questions.append(follow_up_question)
-
-#     # Output the specific query
-#     print("Specific query based on your answer:", user_input)
-
-#     # Ask for another follow-up question or break the loop
-#     continue_choice = input("Do you want to ask another follow-up question? (yes/no): ")
-#     if continue_choice.lower() != 'yes':
-#         break
-

@@ -102,25 +102,3 @@ def get_summary(link):
     with open(cache_directory + str(link_hash) + ".txt", 'w') as file:
         file.write(summary)
     return summary
-
-
-
-
-# test1 = "https://www.cbc.ca/life/culture/the-best-card-games-to-play-with-a-standard-deck-1.5836447"
-# test2 = "https://www.rollingstone.com/tv-movies/tv-movie-news/how-to-watch-downton-abbey-series-movie-free-online-1356705/"
-# test3 = "https://www.cbc.ca/news/canada/london/london-pastor-lacks-funds-but-not-faith-in-building-black-community-centre-1.5836446"
-# tax = "https://www.nerdwallet.com/article/taxes/tax-filing#:~:text=There%20are%20three%20main%20ways,the%20work%20of%20tax%20filing."
-# tests = [test1, test2, test3, tax]
-
-# print(get_summary("https://catadoptionteam.org/"))
-
-# for test in tests:
-#     string = getdata(test)  
-#     helper = summarize(string)
-#     #print(string)
-#     print ("\n\n")
-#     print(helper)
-# string = getdata("https://www.reddit.com/r/photography/comments/1atf3wj/you_should_buy_a_sony_man_and_i_wont/")
-# string = getdata(tax)
-# helper = summarize(string)
-# print(helper)

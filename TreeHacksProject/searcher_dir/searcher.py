@@ -59,7 +59,6 @@ def search(input_query):
         if os.path.isfile(os.path.join(cache_directory, filename)):
             if query == filename[:-4]:
                 with open(cache_directory + filename, 'rb') as results:
-                    #print("cached")
                     return pickle.load(results)
     
     #otherwise google and cache
@@ -69,5 +68,3 @@ def search(input_query):
         pickle.dump(results, file, pickle.HIGHEST_PROTOCOL)
     
     return results
-
-#search("aardvark").display_results()
