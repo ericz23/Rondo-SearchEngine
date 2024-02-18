@@ -26,6 +26,7 @@ class searchbarState(rx.State):
         self.oscillating = True
         self.text = "Chest pain"
         self.word_index = 0
+        self.search_page = 0
     @rx.var
     def get_text(self) -> str:
         return self.text
@@ -43,6 +44,7 @@ class searchbarState(rx.State):
     result_summary3: str = ""
     loading: bool = True
     loading_text: str = "Initializing search..."
+    search_page: int = 0
 
     """The states of the question pane"""
     prompt_question: str = ""
@@ -77,12 +79,13 @@ class searchbarState(rx.State):
         yield # allow for other thread to launch loading screen
         self.loading_text = "Searching the web..."
         self._results = srcr.search(self.text)
-        self.result_title1 = self._results.results[0][0]
-        self.result_link1 = self._results.results[0][1]
-        self.result_title2 = self._results.results[1][0]
-        self.result_link2 = self._results.results[1][1]
-        self.result_title3 = self._results.results[2][0]
-        self.result_link3 = self._results.results[2][1]
+        num_results = len(self._results.results)
+        self.result_title1 = self._results.results[(self.search_page * 3 + 0) % num_results][0] # 10 results, 3 per page
+        self.result_link1 = self._results.results[(self.search_page * 3 + 0) % num_results][1]
+        self.result_title2 = self._results.results[(self.search_page * 3 + 1) % num_results][0]
+        self.result_link2 = self._results.results[(self.search_page * 3 + 1) % num_results][1]
+        self.result_title3 = self._results.results[(self.search_page * 3 + 2) % num_results][0]
+        self.result_link3 = self._results.results[(self.search_page * 3 + 2) % num_results][1]
         self.loading_text = "Summarizing results..."
         self.result_summary1 = summarizer.get_summary(self.result_link1)
         self.result_summary2 = summarizer.get_summary(self.result_link2)
@@ -96,17 +99,25 @@ class searchbarState(rx.State):
         self.num_choices = len(self.choices)
         self.loading = False
 
+    #function to go to next page of results
+    def next_page(self):
+        self.search_page += 1
+        self.loading = True
+        return searchbarState.get_results()
+
     #function to answer a prompt
     def answer_prompt_mc(self, choice: int):
         self.prompt_answer = self.choices[choice]
         self.text = qg.refine_query(self.text, self.prompt_answer, self.prompt_question)
         self.loading = True
+        self.search_page = 0
         return searchbarState.get_results()
 
     def answer_prompt_open(self):
         self.prompt_answer = self.other_box
         self.text = qg.refine_query(self.text, self.prompt_answer, self.prompt_question)
         self.loading = True
+        self.search_page = 0
         return searchbarState.get_results()
     
     def reset_values(self):
@@ -129,6 +140,7 @@ class searchbarState(rx.State):
         self.other_box = ""
         self.selected_answer = 0
         self.prompt_answer = ""
+        self.search_page = 0
 
     
 
@@ -271,7 +283,12 @@ def search() -> rx.Component:
                         padding = "5px",
                 ),
                 rx.card(
-                    rx.heading("Results", size="7"),
+                    rx.flex(
+                        rx.heading("Results", size="7"),
+                        rx.spacer(),
+                        rx.button("Refresh", size="2", on_click=searchbarState.next_page),
+                        padding="10px"
+                    ),
                     rx.box(
                         rx.flex(
                             rx.link(
