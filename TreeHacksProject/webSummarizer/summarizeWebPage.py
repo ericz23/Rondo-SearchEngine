@@ -7,7 +7,8 @@ import os
   
 
 load_dotenv('openAI.env')
-secret_key = os.getenv("OPENAI_KEY")
+secret_key = "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"
+#secret_key = os.getenv("OPENAI_KEY")
 
 
 
@@ -88,12 +89,12 @@ test3 = "https://www.cbc.ca/news/canada/london/london-pastor-lacks-funds-but-not
 tax = "https://www.nerdwallet.com/article/taxes/tax-filing#:~:text=There%20are%20three%20main%20ways,the%20work%20of%20tax%20filing."
 tests = [test1, test2, test3, tax]
 
-for test in tests:
-    string = getdata(test)  
-    helper = summarize(string)
-    print(string)
-    print ("\n\n")
-    print(helper)
+# for test in tests:
+#     string = getdata(test)  
+#     helper = summarize(string)
+#     #print(string)
+#     print ("\n\n")
+#     print(helper)
 # string = getdata("https://www.reddit.com/r/photography/comments/1atf3wj/you_should_buy_a_sony_man_and_i_wont/")
 # string = getdata(tax)
 # helper = summarize(string)
