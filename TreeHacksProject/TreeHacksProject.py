@@ -154,33 +154,38 @@ class searchbarState(rx.State):
 @rx.page(on_load=searchbarState.reset_states)
 def index() -> rx.Component:
     return rx.center(
-        rx.vstack(
-            rx.heading("Welcome to Rondo!", size="9"),
-            rx.hstack(
-                rx.input(size="4",
-                         value = searchbarState.text,
-                         on_focus=searchbarState.pause_oscillation,
-                         on_mount=searchbarState.iterate_word,
-                         on_change=searchbarState.set_text,),
-                rx.link(
-                    rx.button(
-                    "Go",
-                    size="4",
-                    on_click=searchbarState.pause_oscillation_),
-                    href="/search"
-                )
+        rx.flex(
+            rx.image(src="/rondo.png", width="20em"),
+            rx.vstack(
+                rx.heading("Welcome to Rondo!", size="9"),
+                rx.hstack(
+                    rx.input(size="4",
+                            value = searchbarState.text,
+                            on_focus=searchbarState.pause_oscillation,
+                            on_mount=searchbarState.iterate_word,
+                            on_change=searchbarState.set_text,),
+                    rx.link(
+                        rx.button(
+                        "Go",
+                        size="4",
+                        on_click=searchbarState.pause_oscillation_),
+                        href="/search"
+                    )
+                ),
+                align="center",
+                font_size="2em",
+                spacing = "4",
             ),
-            align="center",
-            spacing="7",
-            font_size="2em",
+            direction="column",
+            align="center"
         ),
-        height="100vh",
+        height="75vh",
     )
 
 @rx.page(on_load=searchbarState.get_results)
 def search() -> rx.Component:
     return rx.box( 
-        rx.hstack(
+        rx.flex(
             rx.link(
                 rx.card("New Search",
                         color="white",
@@ -194,12 +199,16 @@ def search() -> rx.Component:
                         on_click=searchbarState.reset_states),
                 href="/"
             ),
+            rx.spacer(),
+            rx.image(src="/rondo.png", width="8em", align="center"),
             # rx.center(
             #     rx.vstack(
             #         rx.heading("Search Results:", size="7"),
             #         padding="10px"
             #     )
             # ),
+            rx.spacer(),
+            rx.spacer(),
             padding="10px"
         ),
         rx.box(
@@ -269,36 +278,45 @@ def search() -> rx.Component:
                                 rx.card(
                                     rx.heading(searchbarState.result_title1),
                                     rx.text(searchbarState.result_summary1),
+                                    on_click = rx.redirect(
+                                        searchbarState.result_link1,
+                                        external=True
+                                    ),
                                     _hover={
                                         "color": "white",
                                         "background_color": "navy",
                                         "cursor": "pointer"}
                                 ),
-                                href=searchbarState.result_link1
                             ),
                             rx.divider(),
                             rx.link(
                                 rx.card(
                                     rx.heading(searchbarState.result_title2),
                                     rx.text(searchbarState.result_summary2),
+                                    on_click = rx.redirect(
+                                    searchbarState.result_link2,
+                                    external=True
+                                    ),
                                     _hover={
                                         "color": "white",
                                         "background_color": "navy",
                                         "cursor": "pointer"}
                                 ),
-                                href=searchbarState.result_link2
                             ),
                             rx.divider(),
                             rx.link(
                                 rx.card(
                                     rx.heading(searchbarState.result_title3),
                                     rx.text(searchbarState.result_summary3),
+                                    on_click = rx.redirect(
+                                        searchbarState.result_link3,
+                                        external=True
+                                    ),
                                     _hover={
                                         "color": "white",
                                         "background_color": "navy",
                                         "cursor": "pointer"}
                                 ),
-                                href=searchbarState.result_link3
                             ),
                             spacing = "4",
                             direction="column",
