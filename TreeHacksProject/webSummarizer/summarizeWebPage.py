@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+import hashlib
   
 
 load_dotenv('openAI.env')
@@ -22,8 +23,11 @@ def __getdata(url):
     """
     r = requests.get(url)  
     soup = BeautifulSoup(r.text, 'html.parser')
-    string = "Title: "
-    string += soup.title.string + " \n Headers \n"
+    string = ""
+    if soup.title is not None:
+        string = "Title: "
+        string += soup.title.string
+    string += " \n Headers \n"
     headers = ["h1", "h2", "h3", "h4", "h5", "h6"]
     for header in headers:
         for data in soup.find_all(header):
@@ -55,7 +59,7 @@ def __summarize(webpage_Data):
     :raises ValueError: If the webpage data is too short to summarize
     """
     if len(webpage_Data) < 100:
-        raise ValueError("Webpage data is too short to summarize")
+        return("Summary not available for this page.")
     webpage_Data = __wordCap(webpage_Data, 450)
     data = {
         "model": "gpt-3.5-turbo-0125",  
@@ -81,10 +85,10 @@ def __summarize(webpage_Data):
 
         return response.json()["choices"][0]["message"]["content"]
     else:
-        return "Error: something went wrong"
+        return "Summary not available for this page."
 
 def get_summary(link):
-    link_hash = hash(link.lower())
+    link_hash = hashlib.sha256(link.encode('utf-8')).hexdigest()
 
     #look for cached copy of search results
     cache_directory = "./TreeHacksProject/webSummarizer/cache/"
@@ -103,13 +107,13 @@ def get_summary(link):
 
 
 
-test1 = "https://www.cbc.ca/life/culture/the-best-card-games-to-play-with-a-standard-deck-1.5836447"
-test2 = "https://www.rollingstone.com/tv-movies/tv-movie-news/how-to-watch-downton-abbey-series-movie-free-online-1356705/"
-test3 = "https://www.cbc.ca/news/canada/london/london-pastor-lacks-funds-but-not-faith-in-building-black-community-centre-1.5836446"
-tax = "https://www.nerdwallet.com/article/taxes/tax-filing#:~:text=There%20are%20three%20main%20ways,the%20work%20of%20tax%20filing."
-tests = [test1, test2, test3, tax]
+# test1 = "https://www.cbc.ca/life/culture/the-best-card-games-to-play-with-a-standard-deck-1.5836447"
+# test2 = "https://www.rollingstone.com/tv-movies/tv-movie-news/how-to-watch-downton-abbey-series-movie-free-online-1356705/"
+# test3 = "https://www.cbc.ca/news/canada/london/london-pastor-lacks-funds-but-not-faith-in-building-black-community-centre-1.5836446"
+# tax = "https://www.nerdwallet.com/article/taxes/tax-filing#:~:text=There%20are%20three%20main%20ways,the%20work%20of%20tax%20filing."
+# tests = [test1, test2, test3, tax]
 
-print(get_summary(test1))
+# print(get_summary("https://catadoptionteam.org/"))
 
 # for test in tests:
 #     string = getdata(test)  
