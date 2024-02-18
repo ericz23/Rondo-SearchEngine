@@ -7,9 +7,8 @@ import os
 import hashlib
   
 
-load_dotenv('openAI.env')
-secret_key = "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"
-#secret_key = os.getenv("OPENAI_KEY")
+
+secret_key = str(os.environ["OPENAI"])
 
 
 
