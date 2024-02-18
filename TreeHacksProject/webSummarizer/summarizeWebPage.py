@@ -7,29 +7,37 @@ import os
   
 
 load_dotenv('openAI.env')
-#secret_key = os.getenv("OPENAI_KEY")
-secret_key = "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"
+secret_key = os.getenv("OPENAI_KEY")
+
 
 
 def getdata(url):  
     """
     Uses BeautifulSoup to extract the text data from webpage
+
     :param url: The URL of the webpage to extract data from
     :return: The text data from the webpage
     :raises ValueError: If there is no textual data that can be extracted using this method
     """
     r = requests.get(url)  
     soup = BeautifulSoup(r.text, 'html.parser')
-    string = ""
+    string = "Title: "
+    string += soup.title.string + " \n Headers \n"
+    headers = ["h1", "h2", "h3", "h4", "h5", "h6"]
+    for header in headers:
+        for data in soup.find_all(header):
+            string += data.get_text() + "\n"
+    string += "\n Body: \n"
     for data in soup.find_all("p"):
+        if len(string.split()) > 600: 
+            break
         string += data.get_text()
-    if string == "":
-        raise ValueError("No textual data to extract")
     return string 
 
 def wordCap(string, cap):
     """
     Caps the number of words in a string (to lessen token usage)
+
     :param string: The string to be capped
     :param cap: The number of words to cap the string at
     :return: The capped string
@@ -40,6 +48,7 @@ def wordCap(string, cap):
 def summarize(webpage_Data):
     """
     Uses OpenAI's GPT-3.5 model to summarize the webpage data and return a summary of the webpage
+    
     :param webpage_Data: The data from the webpage to be summarized
     :return: A summary of the webpage data
     :raises ValueError: If the webpage data is too short to summarize
@@ -76,10 +85,16 @@ def summarize(webpage_Data):
 test1 = "https://www.cbc.ca/life/culture/the-best-card-games-to-play-with-a-standard-deck-1.5836447"
 test2 = "https://www.rollingstone.com/tv-movies/tv-movie-news/how-to-watch-downton-abbey-series-movie-free-online-1356705/"
 test3 = "https://www.cbc.ca/news/canada/london/london-pastor-lacks-funds-but-not-faith-in-building-black-community-centre-1.5836446"
-tests = [test1, test2, test3]
+tax = "https://www.nerdwallet.com/article/taxes/tax-filing#:~:text=There%20are%20three%20main%20ways,the%20work%20of%20tax%20filing."
+tests = [test1, test2, test3, tax]
 
 for test in tests:
     string = getdata(test)  
     helper = summarize(string)
+    print(string)
+    print ("\n\n")
     print(helper)
-
+# string = getdata("https://www.reddit.com/r/photography/comments/1atf3wj/you_should_buy_a_sony_man_and_i_wont/")
+# string = getdata(tax)
+# helper = summarize(string)
+# print(helper)
