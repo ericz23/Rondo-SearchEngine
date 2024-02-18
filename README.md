@@ -1,4 +1,4 @@
-![Alt text](https://ibb.co/Vx0zw5v](https://i.ibb.co/KDcfKS9/rondo.png)
+![Alt text](https://i.ibb.co/KDcfKS9/rondo.png)
 ## A Search Engine for the Elderly Made Easy
 
 ### What it does
