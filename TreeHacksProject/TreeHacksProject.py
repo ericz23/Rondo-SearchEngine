@@ -45,6 +45,7 @@ class searchbarState(rx.State):
     loading: bool = True
     loading_text: str = "Initializing search..."
     search_page: int = 0
+    links_loading: bool = False
 
     """The states of the question pane"""
     prompt_question: str = ""
@@ -76,6 +77,7 @@ class searchbarState(rx.State):
     #functions to run a search
     async def get_results(self):
         self.loading = True
+        self.links_loading = False
         yield # allow for other thread to launch loading screen
         self.loading_text = "Searching the web..."
         self._results = srcr.search(self.text)
@@ -101,9 +103,21 @@ class searchbarState(rx.State):
 
     #function to go to next page of results
     def next_page(self):
+        self.links_loading = True
+        yield
         self.search_page += 1
-        self.loading = True
-        return searchbarState.get_results()
+        num_results = len(self._results.results)
+        self.result_title1 = self._results.results[(self.search_page * 3 + 0) % num_results][0] # 10 results, 3 per page
+        self.result_link1 = self._results.results[(self.search_page * 3 + 0) % num_results][1]
+        self.result_title2 = self._results.results[(self.search_page * 3 + 1) % num_results][0]
+        self.result_link2 = self._results.results[(self.search_page * 3 + 1) % num_results][1]
+        self.result_title3 = self._results.results[(self.search_page * 3 + 2) % num_results][0]
+        self.result_link3 = self._results.results[(self.search_page * 3 + 2) % num_results][1]
+        self.loading_text = "Summarizing results..."
+        self.result_summary1 = summarizer.get_summary(self.result_link1)
+        self.result_summary2 = summarizer.get_summary(self.result_link2)
+        self.result_summary3 = summarizer.get_summary(self.result_link3)
+        self.links_loading = False
 
     #function to answer a prompt
     def answer_prompt_mc(self, choice: int):
@@ -141,6 +155,7 @@ class searchbarState(rx.State):
         self.selected_answer = 0
         self.prompt_answer = ""
         self.search_page = 0
+        self.links_loading = False
 
     
 
@@ -284,65 +299,77 @@ def search() -> rx.Component:
                 ),
                 rx.card(
                     rx.flex(
-                        rx.heading("Results", size="7"),
-                        rx.spacer(),
-                        rx.button("Refresh", size="2", on_click=searchbarState.next_page),
-                        padding="10px"
+                            rx.heading("Results", size="7"),
+                            rx.spacer(),
+                            rx.button("Refresh", size="2", on_click=searchbarState.next_page),
+                            padding="10px"
                     ),
-                    rx.box(
-                        rx.flex(
-                            rx.link(
-                                rx.card(
-                                    rx.heading(searchbarState.result_title1),
-                                    rx.text(searchbarState.result_summary1),
-                                    on_click = rx.redirect(
-                                        searchbarState.result_link1,
-                                        external=True
-                                    ),
-                                    _hover={
-                                        "color": "white",
-                                        "background_color": "navy",
-                                        "cursor": "pointer"}
-                                ),
+                    rx.cond(
+                        searchbarState.links_loading,
+                        rx.center(
+                            rx.vstack(
+                                rx.chakra.circular_progress(is_indeterminate=True),
+                                rx.text("Refreshing links...",color="navy"),
+                                align="center"
                             ),
-                            rx.divider(),
-                            rx.link(
-                                rx.card(
-                                    rx.heading(searchbarState.result_title2),
-                                    rx.text(searchbarState.result_summary2),
-                                    on_click = rx.redirect(
-                                    searchbarState.result_link2,
-                                    external=True
-                                    ),
-                                    _hover={
-                                        "color": "white",
-                                        "background_color": "navy",
-                                        "cursor": "pointer"}
-                                ),
-                            ),
-                            rx.divider(),
-                            rx.link(
-                                rx.card(
-                                    rx.heading(searchbarState.result_title3),
-                                    rx.text(searchbarState.result_summary3),
-                                    on_click = rx.redirect(
-                                        searchbarState.result_link3,
-                                        external=True
-                                    ),
-                                    _hover={
-                                        "color": "white",
-                                        "background_color": "navy",
-                                        "cursor": "pointer"}
-                                ),
-                            ),
-                            spacing = "4",
-                            direction="column",
+                            height="75vh"
                         ),
-                        width="100%",
-                        background_color="var(--plum-2)",
-                        border_radius="15px",
-                        padding = "5px",
+                        rx.box(
+                            rx.flex(
+                                rx.link(
+                                    rx.card(
+                                        rx.heading(searchbarState.result_title1),
+                                        rx.text(searchbarState.result_summary1),
+                                        on_click = rx.redirect(
+                                            searchbarState.result_link1,
+                                            external=True
+                                        ),
+                                        _hover={
+                                            "color": "white",
+                                            "background_color": "navy",
+                                            "cursor": "pointer"}
+                                    ),
+                                ),
+                                rx.divider(),
+                                rx.link(
+                                    rx.card(
+                                        rx.heading(searchbarState.result_title2),
+                                        rx.text(searchbarState.result_summary2),
+                                        on_click = rx.redirect(
+                                        searchbarState.result_link2,
+                                        external=True
+                                        ),
+                                        _hover={
+                                            "color": "white",
+                                            "background_color": "navy",
+                                            "cursor": "pointer"}
+                                    ),
+                                ),
+                                rx.divider(),
+                                rx.link(
+                                    rx.card(
+                                        rx.heading(searchbarState.result_title3),
+                                        rx.text(searchbarState.result_summary3),
+                                        on_click = rx.redirect(
+                                            searchbarState.result_link3,
+                                            external=True
+                                        ),
+                                        _hover={
+                                            "color": "white",
+                                            "background_color": "navy",
+                                            "cursor": "pointer"}
+                                    ),
+                                ),
+                                spacing = "4",
+                                direction="column",
+                            ),
+                            width="100%",
+                            background_color="var(--plum-2)",
+                            border_radius="15px",
+                            padding = "5px",
+                        )
                     )
+                    
                 ),
                 columns = "2"
             )
