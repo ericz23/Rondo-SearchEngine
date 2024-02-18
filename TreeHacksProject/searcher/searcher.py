@@ -59,7 +59,7 @@ def search(input_query):
         if os.path.isfile(os.path.join(cache_directory, filename)):
             if query == filename[:-4]:
                 with open(cache_directory + filename, 'rb') as results:
-                    print("cached")
+                    #print("cached")
                     return pickle.load(results)
     
     #otherwise google and cache

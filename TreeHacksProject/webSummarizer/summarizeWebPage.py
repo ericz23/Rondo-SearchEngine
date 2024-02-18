@@ -12,7 +12,7 @@ secret_key = "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"
 
 
 
-def getdata(url):  
+def __getdata(url):  
     """
     Uses BeautifulSoup to extract the text data from webpage
 
@@ -35,7 +35,7 @@ def getdata(url):
         string += data.get_text()
     return string 
 
-def wordCap(string, cap):
+def __wordCap(string, cap):
     """
     Caps the number of words in a string (to lessen token usage)
 
@@ -46,7 +46,7 @@ def wordCap(string, cap):
     return " ".join(string.split()[:cap])
 
 
-def summarize(webpage_Data):
+def __summarize(webpage_Data):
     """
     Uses OpenAI's GPT-3.5 model to summarize the webpage data and return a summary of the webpage
     
@@ -56,7 +56,7 @@ def summarize(webpage_Data):
     """
     if len(webpage_Data) < 100:
         raise ValueError("Webpage data is too short to summarize")
-    webpage_Data = wordCap(webpage_Data, 450)
+    webpage_Data = __wordCap(webpage_Data, 450)
     data = {
         "model": "gpt-3.5-turbo-0125",  
         "messages": [
@@ -83,11 +83,33 @@ def summarize(webpage_Data):
     else:
         return "Error: something went wrong"
 
+def get_summary(link):
+    link_hash = hash(link.lower())
+
+    #look for cached copy of search results
+    cache_directory = "./TreeHacksProject/webSummarizer/cache/"
+    for filename in os.listdir(cache_directory):
+        if os.path.isfile(os.path.join(cache_directory, filename)):
+            if str(link_hash) == filename[:-4]:
+                with open(cache_directory + filename, 'r') as summary:
+                    return summary.read()
+                
+    # cache results
+    summary = __summarize(__getdata(link))
+    with open(cache_directory + str(link_hash) + ".txt", 'w') as file:
+        file.write(summary)
+    return summary
+
+
+
+
 test1 = "https://www.cbc.ca/life/culture/the-best-card-games-to-play-with-a-standard-deck-1.5836447"
 test2 = "https://www.rollingstone.com/tv-movies/tv-movie-news/how-to-watch-downton-abbey-series-movie-free-online-1356705/"
 test3 = "https://www.cbc.ca/news/canada/london/london-pastor-lacks-funds-but-not-faith-in-building-black-community-centre-1.5836446"
 tax = "https://www.nerdwallet.com/article/taxes/tax-filing#:~:text=There%20are%20three%20main%20ways,the%20work%20of%20tax%20filing."
 tests = [test1, test2, test3, tax]
+
+print(get_summary(test1))
 
 # for test in tests:
 #     string = getdata(test)  
