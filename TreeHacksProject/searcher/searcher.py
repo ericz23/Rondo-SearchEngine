@@ -6,7 +6,7 @@
 #imports
 import requests
 import json
-import search_results
+import TreeHacksProject.searcher.search_results as search_results
 import re
 import pickle
 import os
@@ -54,7 +54,7 @@ def search(input_query):
     query = re.sub(r'\s+', "_", query) #replace spaces with underscores
 
     #look for cached copy of search results
-    cache_directory = "./src/searcher/cache/"
+    cache_directory = "./TreeHacksProject/searcher/cache/"
     for filename in os.listdir(cache_directory):
         if os.path.isfile(os.path.join(cache_directory, filename)):
             if query == filename[:-4]:
