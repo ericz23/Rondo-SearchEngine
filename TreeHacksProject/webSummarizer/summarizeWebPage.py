@@ -8,7 +8,7 @@ import hashlib
   
 
 
-secret_key = str(os.environ["OPENAI"])
+secret_key = str(os.environ["OPENAI_API_KEY"])
 
 
 

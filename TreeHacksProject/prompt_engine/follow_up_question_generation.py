@@ -3,7 +3,7 @@ import string
 import os
 
 # Set up your OpenAI API key
-openai.api_key = str(os.environ['OPENAI'])
+openai.api_key = str(os.environ['OPENAI_API_KEY'])
 
 def generate_follow_up_question(input_query, previous_questions):
     # Constructing the prompt for ChatGPT
